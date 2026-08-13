@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#050914">
+  <title>E-Clas — House Revelation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <canvas id="starfield" aria-hidden="true"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="noise" aria-hidden="true"></div>
+
+  <main id="app">
+    <section id="landing" class="screen active">
+      <div class="opening-ceremony">
+        <div class="logo-orbit" aria-hidden="true">
+          <span class="logo-orbit-ring ring-one"></span>
+          <span class="logo-orbit-ring ring-two"></span>
+          <span class="logo-star star-a">✦</span>
+          <span class="logo-star star-b">✧</span>
+          <span class="logo-star star-c">✦</span>
+          <span class="logo-core">E</span>
+        </div>
+
+        <div class="eclas-logo">
+          <div class="eclas-mark">E<span>✦</span></div>
+          <div class="eclas-word">E-CLAS</div>
+          <div class="eclas-subtitle">ENGLISH CLUB</div>
+        </div>
+
+        <div class="opening-rule"><span>✦</span></div>
+        <div class="eyebrow">THE HOUSE REVELATION</div>
+        <p class="opening-line">Two Stars. One Sky. One Journey.</p>
+
+        <button id="beginBtn" class="primary-btn ceremony-btn">
+          <span>Enter the Star Altar</span><span class="arrow">→</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="entry" class="screen">
+      <div class="star-altar">
+        <div class="altar-heading">
+          <div class="eyebrow">THE STAR ALTAR</div>
+          <h2>Approach the stars.</h2>
+          <p>Your place among the constellations has already been chosen.</p>
+        </div>
+
+        <div class="altar-scene" aria-hidden="true">
+          <div class="altar-halo halo-one"></div>
+          <div class="altar-halo halo-two"></div>
+          <div class="altar-ring ring-outer"></div>
+          <div class="altar-ring ring-middle"></div>
+          <div class="altar-ring ring-inner"></div>
+          <div class="altar-pedestal">
+            <div class="altar-flame"></div>
+            <div class="altar-gem">✦</div>
+          </div>
+        </div>
+
+        <div class="altar-selection">
+          <div class="altar-label">CHOOSE YOUR NAME</div>
+          <div class="name-selector" id="nameSelector">
+            <button class="select-trigger" id="selectTrigger" type="button" aria-expanded="false">
+              <span id="selectedName">Select your name</span>
+              <span class="select-chevron">⌄</span>
+            </button>
+            <div class="name-menu" id="nameMenu" role="listbox">
+              <button class="name-option" type="button" data-name="Zainal Aqli">
+                <span class="option-star">✦</span><span>Zainal Aqli</span>
+              </button>
+              <button class="name-option" type="button" data-name="Santos">
+                <span class="option-star">✦</span><span>Santos</span>
+              </button>
+              <button class="name-option mentor-option" type="button" data-name="Mentor" data-role="mentor">
+                <span class="option-star">✦</span><span>Mentor</span>
+              </button>
+            </div>
+          </div>
+
+          <button id="findStarBtn" class="primary-btn find-btn" disabled>
+            <span>Awaken My Star</span><span class="arrow">✦</span>
+          </button>
+          <p id="errorMessage" class="error" role="alert"></p>
+        </div>
+
+        <button id="backBtn" class="text-btn">← Return to the entrance</button>
+      </div>
+    </section>
+
+    <section id="searching" class="screen">
+      <div class="search-state">
+        <div class="orbit-loader" aria-hidden="true">
+          <div class="orbit orbit-a"></div>
+          <div class="orbit orbit-b"></div>
+          <div class="orbit-dot"></div>
+          <div class="loader-star">✦</div>
+        </div>
+        <div class="eyebrow">STARFIELD SCAN</div>
+        <h2 id="searchTitle">The altar is listening...</h2>
+        <p id="searchSubtitle">The stars are beginning to answer.</p>
+      </div>
+    </section>
+
+    <section id="prereveal" class="screen">
+      <div class="pre-reveal">
+        <div class="eyebrow">IDENTITY CONFIRMED</div>
+        <h2>Welcome, <span id="studentDisplay"></span>.</h2>
+        <p class="poetic">Your journey has already been written among the stars.<br>Look to the sky...</p>
+        <button id="revealBtn" class="primary-btn reveal-btn">
+          <span>Reveal My Star</span><span class="arrow">✦</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="revelation" class="screen">
+      <div class="revelation-stage">
+        <div id="revealAura" class="reveal-aura"></div>
+        <div id="constellation" class="constellation"></div>
+
+        <!-- The star is now an emblem above the House name, never over the typography. -->
+        <div id="revealStar" class="reveal-star" aria-hidden="true"><img id="revealSymbol" src="assets/symbol-aldebaran.png" alt=""></div>
+
+        <div id="houseResult" class="house-result">
+          <div class="house-kicker">YOUR STAR HAS BEEN REVEALED</div>
+          <h2 id="houseName">ALDEBARAN</h2>
+          <div class="house-divider"><span>✦</span></div>
+          <h3 id="houseTitle">THE GUIDING STAR</h3>
+          <p id="houseMotto">Follow the light. Find your way.</p>
+          <div class="student-result" id="resultStudent"></div>
+          <button id="continueBtn" class="primary-btn">
+            <span id="continueText">Enter Aldebaran</span><span class="arrow">→</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="mentorReveal" class="screen">
+      <div class="mentor-reveal-stage">
+        <div class="eyebrow">THE GUIDING STARS</div>
+        <h2>YOUR MENTORS</h2>
+        <p class="mentor-reveal-intro">Two stars. Two Houses. One constellation of guidance.</p>
+        <div class="mentor-reveal-grid">
+          <article class="mentor-reveal-card mentor-reveal-aldebaran">
+            <div class="mentor-reveal-photo">
+              <div class="mentor-reveal-glow"></div>
+              <img src="assets/coach-aldebaran.png" alt="Yanda Zainal Aqli, S.Pd">
+            </div>
+            <div class="mentor-reveal-house">ALDEBARAN</div>
+            <div class="mentor-reveal-role">HOUSE MENTOR</div>
+            <div class="mentor-reveal-name">Yanda Zainal Aqli, S.Pd</div>
+          </article>
+          <article class="mentor-reveal-card mentor-reveal-sirius">
+            <div class="mentor-reveal-photo">
+              <div class="mentor-reveal-glow"></div>
+              <img src="assets/coach-sirius.png" alt="Yanda Nugroho Santos, S.Pd">
+            </div>
+            <div class="mentor-reveal-house">SIRIUS</div>
+            <div class="mentor-reveal-role">HOUSE MENTOR</div>
+            <div class="mentor-reveal-name">Yanda Nugroho Santos, S.Pd</div>
+          </article>
+        </div>
+        <button id="mentorBackBtn" class="text-btn">← Return to the Star Altar</button>
+      </div>
+    </section>
+
+    <section id="housePage" class="screen">
+      <div id="housePageContent" class="house-page">
+        <div class="house-symbol-large"><img id="pageHouseSymbol" src="assets/symbol-aldebaran.png" alt="Aldebaran symbol"></div>
+        <div class="eyebrow">E-CLAS • ENGLISH CLUB</div>
+        <h2 id="pageHouseName">ALDEBARAN</h2>
+        <h3 id="pageHouseTitle">THE GUIDING STAR</h3>
+        <p id="pageHouseMotto" class="page-motto">Steadfast in Integrity, Fearless in Duty.</p>
+        <div class="identity-block">
+          <div class="identity-label">HOUSE VALUES</div>
+          <div class="values"></div>
+        </div>
+        <div class="house-mentor">
+          <span>HOUSE MENTOR</span><strong id="pageMentor"></strong>
+        </div>
+        <div class="student-badge">
+          <span>YOUR STAR</span><strong id="pageStudent"></strong>
+        </div>
+        <button id="restartBtn" class="text-btn">Return to the Starfield</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/stars.js"></script>
+  <script src="js/revelation.js"></script>
+  <script src="js/audio-manager.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
