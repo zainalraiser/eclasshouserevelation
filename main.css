@@ -1,0 +1,384 @@
+:root {
+  --bg:#050914; --text:#f2f5fa; --muted:#9ca8bb; --line:rgba(255,255,255,.14);
+  --blue:#4b9cff; --blue-soft:#b9dcff; --gold:#e7cf96;
+  --serif:"Cinzel",Georgia,serif; --sans:"Inter",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;min-height:100%;background:var(--bg);color:var(--text)}
+body{font-family:var(--sans);overflow-x:hidden;overflow-y:auto}
+#starfield{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(circle at center,transparent 20%,rgba(0,0,0,.18) 55%,rgba(0,0,0,.72) 100%)}
+.noise{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E")}
+#app{position:relative;z-index:3;min-height:100vh}
+.screen{position:absolute;inset:0;min-height:100vh;height:100vh;overflow-y:auto;overflow-x:hidden;display:grid;place-items:center;padding:30px;opacity:0;visibility:hidden;transform:scale(.985);transition:opacity .65s ease,transform .65s ease,visibility .65s}
+.screen.active{opacity:1;visibility:visible;transform:scale(1)}
+.hero,.panel,.search-state,.pre-reveal,.revelation-stage,.house-page{width:min(900px,100%);text-align:center}
+.hero{display:flex;flex-direction:column;align-items:center}
+.eyebrow{font-size:10px;letter-spacing:.42em;text-transform:uppercase;color:var(--muted);margin-bottom:22px}
+.hero-star{width:90px;height:90px;position:relative;margin:5px 0 30px;animation:float 4s ease-in-out infinite}
+.star-core{position:absolute;width:18px;height:18px;border-radius:50%;left:36px;top:36px;background:#fff;box-shadow:0 0 18px 7px rgba(150,205,255,.8),0 0 55px 18px rgba(80,145,255,.22)}
+.star-ray{position:absolute;left:43px;top:5px;width:4px;height:80px;background:linear-gradient(transparent,#fff,transparent);transform-origin:center}
+.ray-1{transform:rotate(45deg);opacity:.75}.ray-2{transform:rotate(-45deg);opacity:.75}
+h1,h2,h3{font-family:var(--serif);font-weight:500}
+h1{font-size:clamp(42px,8vw,86px);line-height:.95;letter-spacing:.08em;margin:0}
+h1 span{font-size:.48em;letter-spacing:.38em;color:var(--blue-soft)}
+h2{font-size:clamp(30px,5vw,52px);margin:0 0 14px;letter-spacing:.05em}
+h3{letter-spacing:.3em;font-size:16px}
+.tagline,.poetic{color:var(--muted);letter-spacing:.16em;font-size:12px;margin:25px 0 35px}
+.primary-btn{border:1px solid rgba(170,210,255,.42);background:rgba(10,28,55,.7);color:#fff;padding:16px 22px;min-width:220px;border-radius:2px;font:500 11px var(--sans);letter-spacing:.22em;text-transform:uppercase;cursor:pointer;transition:.3s ease;display:inline-flex;justify-content:center;gap:22px}
+.primary-btn:hover{background:rgba(60,125,210,.22);border-color:var(--blue);transform:translateY(-2px);box-shadow:0 0 30px rgba(75,156,255,.15)}
+.primary-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
+.arrow{font-size:16px;line-height:10px}
+.panel{width:min(600px,100%);padding:52px 42px;background:linear-gradient(145deg,rgba(9,19,41,.88),rgba(4,9,20,.75));border:1px solid var(--line);backdrop-filter:blur(12px);box-shadow:0 25px 80px rgba(0,0,0,.35)}
+.small-star{color:var(--blue-soft);font-size:20px;margin-bottom:18px}
+.entry-panel p{color:var(--muted);line-height:1.7}
+
+/* Elegant name selector — no typing required */
+.name-selector{position:relative;margin:32px auto 18px;text-align:left}
+.select-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;padding:18px 20px;background:rgba(5,12,27,.75);border:1px solid rgba(170,205,240,.25);color:#fff;font:400 14px var(--sans);letter-spacing:.04em;cursor:pointer;transition:.25s}
+.select-trigger:hover,.name-selector.open .select-trigger{border-color:rgba(100,170,255,.65);box-shadow:0 0 25px rgba(50,130,255,.08)}
+.select-chevron{font-size:20px;color:var(--blue-soft);transition:.25s}
+.name-selector.open .select-chevron{transform:rotate(180deg)}
+.name-menu{position:absolute;left:0;right:0;top:calc(100% + 7px);z-index:20;padding:7px;background:rgba(5,12,27,.98);border:1px solid rgba(170,205,240,.22);box-shadow:0 25px 60px rgba(0,0,0,.45);opacity:0;visibility:hidden;transform:translateY(-8px);transition:.22s}
+.name-selector.open .name-menu{opacity:1;visibility:visible;transform:translateY(0)}
+.name-option{width:100%;display:flex;align-items:center;gap:14px;padding:15px 14px;background:transparent;border:0;color:#e9eef7;text-align:left;font:400 13px var(--sans);cursor:pointer}
+.name-option:hover{background:rgba(75,156,255,.10);color:#fff}
+.option-star{color:var(--blue-soft);font-size:13px}
+.find-btn{margin-top:8px}
+.error{min-height:20px;color:#ff8d8d;font-size:12px;margin:12px 0 0}
+.text-btn{margin-top:30px;background:transparent;border:0;color:var(--muted);cursor:pointer;font-size:11px;letter-spacing:.15em;text-transform:uppercase}
+.text-btn:hover{color:#fff}
+.orbit-loader{width:190px;height:190px;position:relative;margin:0 auto 35px}
+.orbit{position:absolute;inset:15px;border:1px solid rgba(130,180,255,.35);border-radius:50%;animation:spin 5s linear infinite}
+.orbit-b{inset:38px;border-style:dashed;animation-direction:reverse;animation-duration:3.2s}
+.orbit-dot{position:absolute;width:7px;height:7px;background:var(--blue);border-radius:50%;top:16px;left:50%;box-shadow:0 0 16px var(--blue)}
+.loader-star{position:absolute;inset:0;display:grid;place-items:center;font-size:40px;color:#fff;animation:pulse 1.5s ease-in-out infinite}
+.search-state h2{font-size:25px}.search-state p{color:var(--muted)}
+.pre-reveal .poetic{line-height:2}.reveal-btn{margin-top:15px}
+
+/* Revelation: reserved vertical zones keep the emblem away from the typography */
+.revelation-stage{position:relative;height:min(780px,90vh);display:flex;justify-content:center;align-items:flex-start}
+.reveal-aura{position:absolute;top:12%;left:50%;width:270px;height:270px;margin-left:-135px;border-radius:50%;background:#4b9cff;opacity:0;filter:blur(70px);transform:scale(.2)}
+.constellation{position:absolute;top:6%;left:50%;width:380px;height:380px;margin-left:-190px;border:1px solid rgba(255,255,255,.1);border-radius:50%;opacity:0}
+.constellation::before,.constellation::after{content:"";position:absolute;inset:25px;border:1px dashed rgba(255,255,255,.13);border-radius:50%}
+.constellation::after{inset:80px;border-style:solid;opacity:.65}
+
+/* Star is deliberately above the title, not behind it */
+.reveal-star{position:absolute;top:15%;left:50%;transform:translateX(-50%) scale(.1);font-size:72px;line-height:1;color:#6eb2ff;opacity:0;text-shadow:0 0 25px currentColor,0 0 65px currentColor;z-index:2;width:150px;height:150px;display:grid;place-items:center}
+.reveal-star img{width:100%;height:100%;object-fit:contain;display:block;filter:drop-shadow(0 0 18px currentColor) drop-shadow(0 0 45px currentColor);border-radius:50%}
+.house-result{position:absolute;top:46%;left:0;right:0;opacity:0;transform:translateY(30px);z-index:5}
+.house-kicker{font-size:10px;letter-spacing:.4em;color:var(--muted)}
+.house-result h2{font-size:clamp(48px,9vw,96px);margin:10px 0;line-height:1}
+.house-divider{display:flex;justify-content:center;align-items:center;gap:18px;color:var(--gold)}
+.house-divider::before,.house-divider::after{content:"";width:110px;height:1px;background:currentColor;opacity:.5}
+.house-divider span{font-size:13px}
+.house-result h3{margin:18px 0 9px;color:var(--gold)}
+.house-result p{font-size:13px;font-style:italic;color:var(--muted);letter-spacing:.08em}
+.student-result{margin:18px 0 25px;font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+.house-result .primary-btn{opacity:0;transform:translateY(15px)}
+
+.house-page{max-width:760px;padding:30px}
+.house-mark{font-size:70px;margin-bottom:12px;animation:float 4s ease-in-out infinite}
+.house-page h2{font-size:clamp(52px,10vw,100px);margin:0}
+.house-page h3{color:var(--gold);margin:8px 0 16px}
+.page-motto{color:var(--muted);font-style:italic}
+.values{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin:45px 0 28px;border:1px solid var(--line);background:var(--line)}
+.value{padding:18px 10px;background:rgba(5,10,22,.72);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+.value span{display:block;font-size:9px;color:var(--muted);margin-bottom:7px}
+.student-badge{margin:0 auto;width:min(390px,100%);padding:20px;border:1px solid var(--line);background:rgba(10,20,38,.65)}
+.student-badge span{display:block;color:var(--muted);font-size:9px;letter-spacing:.25em;margin-bottom:8px}
+.student-badge strong{font:500 20px var(--serif);letter-spacing:.08em}
+
+.theme-aldebaran .reveal-aura{background:#247fff}
+.theme-aldebaran .house-result h2,.theme-aldebaran .house-mark{color:#7db8ff}
+.theme-aldebaran .reveal-star{color:#6eb2ff}
+.theme-sirius .reveal-aura{background:#d82d32}
+.theme-sirius .house-result h2,.theme-sirius .house-mark{color:#ff5959}
+.theme-sirius .reveal-star{color:#ff3434}
+
+.revealing .reveal-aura{animation:auraReveal 2.1s ease forwards}
+.revealing .constellation{animation:constellationReveal 1.8s .35s ease forwards}
+.revealing .reveal-star{animation:starReveal 1.2s .65s cubic-bezier(.2,.8,.2,1) forwards}
+.revealing .house-result{animation:resultReveal 1s 1.9s ease forwards}
+.revealing .house-result .primary-btn{animation:buttonReveal .7s 2.7s ease forwards}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{50%{transform:scale(1.18);opacity:.7}}
+@keyframes float{50%{transform:translateY(-8px)}}
+@keyframes auraReveal{0%{opacity:0;transform:scale(.2)}35%{opacity:.8}100%{opacity:.2;transform:scale(3.2)}}
+@keyframes constellationReveal{0%{opacity:0;transform:scale(.3) rotate(-30deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes starReveal{0%{opacity:0;transform:translateX(-50%) scale(.05) rotate(-90deg)}55%{opacity:1;transform:translateX(-50%) scale(1.15) rotate(8deg)}100%{opacity:1;transform:translateX(-50%) scale(1) rotate(0)}}
+@keyframes resultReveal{to{opacity:1;transform:translateY(0)}}
+@keyframes buttonReveal{to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:640px){
+  .screen{padding:18px}.panel{padding:38px 24px}.values{grid-template-columns:repeat(2,1fr)}
+  .revelation-stage{height:86vh}.constellation{width:290px;height:290px;margin-left:-145px}
+  .reveal-star{top:13%;font-size:58px}.house-result{top:43%}
+  .house-divider::before,.house-divider::after{width:55px}.eyebrow{letter-spacing:.28em}
+}
+
+/* ---------- Opening E-Clas Star Emblem ---------- */
+.opening-ceremony{
+  width:min(700px,100%); text-align:center; display:flex; flex-direction:column;
+  align-items:center; animation:openingBreath 5s ease-in-out infinite;
+}
+.logo-orbit{width:155px;height:155px;position:relative;margin-bottom:24px}
+.logo-orbit-ring{position:absolute;border:1px solid rgba(145,193,255,.24);border-radius:50%;inset:9px}
+.logo-orbit-ring.ring-one{transform:rotate(35deg) scaleX(.78);animation:orbitSpin 16s linear infinite}
+.logo-orbit-ring.ring-two{inset:25px;transform:rotate(-35deg) scaleX(.72);border-style:dashed;animation:orbitSpinReverse 12s linear infinite}
+.logo-core{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:68px;height:68px;border:1px solid rgba(180,215,255,.55);border-radius:50%;
+  display:grid;place-items:center;font:600 36px var(--serif);color:#edf6ff;
+  background:radial-gradient(circle,rgba(90,150,255,.18),rgba(4,10,23,.85) 68%);
+  box-shadow:0 0 30px rgba(70,145,255,.2),inset 0 0 25px rgba(100,175,255,.12)
+}
+.logo-core::after{content:"";position:absolute;inset:-8px;border-radius:50%;border:1px solid rgba(210,230,255,.1)}
+.logo-star{position:absolute;color:#cbe5ff;text-shadow:0 0 12px currentColor,0 0 28px rgba(80,150,255,.5);font-size:14px}
+.star-a{top:2px;left:67px}.star-b{right:10px;top:70px;font-size:11px}.star-c{left:15px;bottom:23px}
+.eclas-logo{margin-bottom:22px}
+.eclas-mark{
+  font:600 16px var(--serif);letter-spacing:.12em;color:#c8e2ff;
+  margin-bottom:5px
+}
+.eclas-mark span{font-size:10px;margin-left:4px;color:#fff;text-shadow:0 0 12px #78b8ff}
+.eclas-word{
+  font:600 clamp(43px,8vw,76px) var(--serif);letter-spacing:.22em;
+  margin-left:.22em;line-height:1;color:#f4f8ff;
+  text-shadow:0 0 28px rgba(80,155,255,.18)
+}
+.eclas-subtitle{font-size:9px;letter-spacing:.52em;color:#8493a9;margin-top:10px}
+.opening-rule{display:flex;align-items:center;gap:14px;width:190px;color:#d9c88f;margin:7px 0 19px}
+.opening-rule::before,.opening-rule::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,transparent,currentColor,transparent);opacity:.55}
+.opening-rule span{font-size:10px}
+.opening-line{font-size:11px;color:#9daabd;letter-spacing:.22em;margin:0 0 34px}
+.ceremony-btn{min-width:235px}
+
+/* ---------- Star Altar ---------- */
+.star-altar{
+  width:min(820px,100%);text-align:center;display:flex;flex-direction:column;align-items:center;
+  position:relative; margin:0 auto; padding:6px 0 55px;
+}
+
+/* The Star Altar is intentionally scrollable on short laptop screens. */
+#entry{display:block;padding:38px 24px 70px;overflow-y:auto;overscroll-behavior:contain}
+#entry .star-altar{min-height:calc(100vh - 108px)}
+.altar-heading{position:relative;z-index:4}
+.altar-heading h2{margin-bottom:8px}
+.altar-heading p{color:var(--muted);font-size:12px;letter-spacing:.08em;margin:0}
+.altar-scene{
+  position:relative;width:390px;height:300px;margin:-3px auto -4px;
+  display:grid;place-items:center
+}
+.altar-halo{position:absolute;border-radius:50%;filter:blur(30px);opacity:.18}
+.halo-one{width:170px;height:170px;background:#4d9dff;animation:haloPulse 3s ease-in-out infinite}
+.halo-two{width:280px;height:90px;background:#387fe0;filter:blur(55px);opacity:.11}
+.altar-ring{position:absolute;border:1px solid rgba(145,193,255,.2);border-radius:50%}
+.ring-outer{width:280px;height:280px;animation:altarSpin 18s linear infinite}
+.ring-middle{width:215px;height:215px;border-style:dashed;animation:altarSpinReverse 12s linear infinite}
+.ring-inner{width:145px;height:145px;border-color:rgba(180,215,255,.28)}
+.altar-pedestal{
+  position:absolute;bottom:30px;width:105px;height:105px;
+  display:grid;place-items:center;
+  background:radial-gradient(circle,rgba(84,160,255,.16),rgba(5,12,28,.95) 67%);
+  border:1px solid rgba(180,215,255,.38);
+  transform:rotate(45deg);box-shadow:0 0 45px rgba(65,140,255,.18)
+}
+.altar-pedestal::before{
+  content:"";position:absolute;inset:13px;border:1px solid rgba(190,220,255,.2)
+}
+.altar-gem{
+  transform:rotate(-45deg);font-size:44px;color:#eaf6ff;
+  text-shadow:0 0 14px #78b8ff,0 0 40px #3c8fff;
+  animation:gemPulse 2.2s ease-in-out infinite
+}
+.altar-flame{
+  position:absolute;width:40px;height:40px;border-radius:50%;
+  background:#72b5ff;filter:blur(20px);opacity:.55
+}
+.altar-selection{position:relative;z-index:10;width:min(440px,100%)}
+.altar-label{font-size:9px;letter-spacing:.38em;color:#7e8ba1;margin-bottom:10px}
+.star-altar .name-selector{margin:0 auto 14px}
+.star-altar .select-trigger{background:rgba(4,11,26,.82);padding:17px 19px}
+.star-altar .name-menu{background:rgba(3,9,21,.99);max-height:270px;overflow-y:auto}
+.star-altar .find-btn{margin-top:0}
+.star-altar .text-btn{margin-top:22px}
+
+@keyframes openingBreath{50%{transform:translateY(-3px)}}
+@keyframes orbitSpin{to{transform:rotate(395deg) scaleX(.78)}}
+@keyframes orbitSpinReverse{to{transform:rotate(-395deg) scaleX(.72)}}
+@keyframes haloPulse{50%{transform:scale(1.16);opacity:.28}}
+@keyframes altarSpin{to{transform:rotate(360deg)}}
+@keyframes altarSpinReverse{to{transform:rotate(-360deg)}}
+@keyframes gemPulse{50%{transform:rotate(-45deg) scale(1.13);text-shadow:0 0 20px #9bcfff,0 0 60px #3c8fff}}
+
+/* Discreet one-button mentor reveal */
+.coach-sigil{width:42px;height:42px;margin:6px auto 0;border-radius:50%;border:1px solid rgba(190,220,255,.20);background:rgba(5,13,29,.55);color:#a9d3ff;cursor:pointer;display:grid;place-items:center;font-size:16px;position:relative;transition:.35s;opacity:.78}
+.coach-sigil::before,.coach-sigil::after{content:"";position:absolute;inset:6px;border:1px solid rgba(130,190,255,.11);border-radius:50%;transform:rotate(45deg)}
+.coach-sigil::after{inset:11px;border-style:dashed}
+.coach-sigil:hover,.coach-sigil.revealed{border-color:rgba(120,185,255,.7);box-shadow:0 0 24px rgba(70,150,255,.22);opacity:1;transform:scale(1.06)}
+.coach-card{width:min(440px,100%);margin:14px auto 5px;padding:0;display:flex;align-items:center;gap:15px;text-align:left;background:linear-gradient(110deg,rgba(8,18,39,.92),rgba(4,9,20,.82));border:1px solid rgba(170,205,240,.17);box-shadow:0 20px 45px rgba(0,0,0,.25);opacity:0;visibility:hidden;transform:translateY(-7px) scale(.98);max-height:0;overflow:hidden;transition:opacity .45s,transform .45s,max-height .55s,padding .45s}
+.coach-card.visible{opacity:1;visibility:visible;transform:none;max-height:130px;padding:12px}
+.coach-photo-frame{position:relative;width:74px;height:74px;min-width:74px;border-radius:50%;overflow:hidden;border:1px solid rgba(190,220,255,.4);box-shadow:0 0 20px rgba(70,150,255,.13)}
+.coach-photo-frame img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
+.photo-glow{position:absolute;inset:0;box-shadow:inset 0 0 20px rgba(100,170,255,.16)}
+.coach-copy{min-width:0}.coach-label{font-size:8px;letter-spacing:.28em;color:#75849a;margin-bottom:4px}.coach-house{font:600 13px var(--serif);letter-spacing:.12em;color:#78b8ff;margin-bottom:4px}.coach-name{font:500 14px var(--serif);color:#f0f4fa}.coach-role{font-size:8px;letter-spacing:.18em;color:#65748b;margin-top:5px}
+.theme-sirius .coach-house{color:#ff6666}.theme-sirius .coach-sigil{color:#ff7777}
+@media(max-width:640px){.coach-card{gap:11px}.coach-photo-frame{width:62px;height:62px;min-width:62px}.coach-name{font-size:12px}}
+
+/* ---------- V5: Dedicated Mentor Chamber ---------- */
+.sigil-hint{font-size:8px;letter-spacing:.2em;color:#59687e;margin-top:8px;text-transform:uppercase}
+.mentor-chamber{width:min(720px,100%);text-align:center;display:flex;flex-direction:column;align-items:center;animation:mentorIn .8s ease both}
+.mentor-chamber h2{margin:9px 0 8px;font:500 clamp(32px,5vw,48px) var(--serif);letter-spacing:.02em;color:#eef5ff}
+.mentor-intro{font-size:12px;color:var(--muted);letter-spacing:.08em;margin:0 0 30px}
+.mentor-chamber .coach-card{position:relative;width:min(500px,100%);max-height:none!important;padding:20px 22px!important;display:flex;align-items:center;gap:22px;text-align:left;background:linear-gradient(115deg,rgba(9,22,45,.96),rgba(3,9,20,.95));border:1px solid rgba(180,215,255,.25);box-shadow:0 0 0 1px rgba(255,255,255,.025),0 25px 80px rgba(0,0,0,.35);opacity:1;visibility:visible;transform:none;overflow:visible}
+.mentor-chamber .coach-photo-frame{position:relative;width:148px;height:148px;min-width:148px;border-radius:50%;overflow:hidden;border:1px solid rgba(195,225,255,.55);background:#081225;box-shadow:0 0 0 7px rgba(110,170,255,.035),0 0 45px rgba(75,150,255,.2)}
+.mentor-chamber .coach-photo-frame img{position:relative;z-index:3;width:100%;height:100%;object-fit:cover;object-position:center;display:block}
+.photo-orbit{position:absolute;inset:-9px;border:1px solid rgba(125,190,255,.22);border-radius:50%;z-index:1;animation:mentorOrbit 8s linear infinite}
+.photo-orbit-a{transform:scaleX(.62) rotate(25deg)}
+.photo-orbit-b{inset:4px;transform:scaleX(.8) rotate(-40deg);border-style:dashed;animation-duration:6s;animation-direction:reverse}
+.mentor-chamber .coach-copy{flex:1;min-width:0}
+.mentor-chamber .coach-label{font-size:9px;letter-spacing:.32em;color:#8191a8;margin-bottom:10px}
+.mentor-chamber .coach-name{font:500 clamp(20px,3vw,28px) var(--serif);line-height:1.18;color:#f5f8fd}
+.mentor-chamber .coach-role{font-size:9px;letter-spacing:.25em;color:#7890ad;margin-top:10px}
+.mentor-actions{margin-top:30px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.mentor-actions .primary-btn{min-width:220px}
+@keyframes mentorIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes mentorOrbit{to{transform:scaleX(.62) rotate(385deg)}}
+@media(max-width:600px){.mentor-chamber .coach-card{flex-direction:column;text-align:center}.mentor-chamber .coach-photo-frame{width:128px;height:128px;min-width:128px}.mentor-chamber .coach-copy{width:100%}}
+#findStarBtn{display:inline-flex}
+
+/* ---------- Path selector: Students / Mentors ---------- */
+.altar-selection{width:min(720px,100%);position:relative;z-index:12}
+.altar-mode{display:flex;justify-content:center;gap:8px;margin:0 auto 18px;padding:4px;width:min(360px,100%);border:1px solid rgba(145,193,255,.16);background:rgba(3,10,24,.62);border-radius:999px}
+.mode-btn{flex:1;border:0;background:transparent;color:#77859b;padding:10px 18px;border-radius:999px;font:600 9px var(--sans);letter-spacing:.25em;cursor:pointer;transition:.3s}
+.mode-btn:hover{color:#dcecff}
+.mode-btn.active{background:rgba(104,165,239,.14);color:#eaf4ff;box-shadow:0 0 20px rgba(65,140,255,.08),inset 0 0 12px rgba(120,185,255,.06)}
+.path-panel{display:none;animation:panelIn .45s ease both}
+.path-panel.active-panel{display:block}
+.small-label{font-size:8px;letter-spacing:.32em;color:#7d8ba1;margin-bottom:9px}
+.mentor-heading{margin:0 auto 15px;text-align:center}
+.mentor-heading p{margin:0;color:#8e9caf;font-size:11px;letter-spacing:.05em}
+.mentor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;width:min(650px,100%);margin:0 auto}
+.mentor-card{position:relative;padding:12px 12px 16px;border:1px solid rgba(145,193,255,.16);background:linear-gradient(180deg,rgba(9,20,42,.74),rgba(3,9,21,.9));overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.25)}
+.mentor-card::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.035),transparent 65%);transform:translateX(-100%);transition:1.2s}
+.mentor-card:hover::after{transform:translateX(100%)}
+.mentor-photo-wrap{position:relative;height:255px;overflow:hidden;background:#070e1d;border:1px solid rgba(190,220,255,.18)}
+.mentor-photo-wrap img{position:relative;z-index:2;width:100%;height:100%;object-fit:cover;object-position:center 18%;display:block;filter:saturate(.82) contrast(1.03);transition:transform .7s ease,filter .7s ease}
+.mentor-card:hover img{transform:scale(1.035);filter:saturate(1) contrast(1.04)}
+.mentor-glow{position:absolute;z-index:1;inset:15% 18%;border-radius:50%;filter:blur(28px);opacity:.34}
+.mentor-aldebaran .mentor-glow{background:#418eff}.mentor-sirius .mentor-glow{background:#d53c48}
+.mentor-house{font:600 10px var(--serif);letter-spacing:.28em;margin-top:13px}
+.mentor-aldebaran .mentor-house{color:#83baff}.mentor-sirius .mentor-house{color:#ff8890}
+.mentor-name{font:600 13px var(--sans);color:#edf4ff;margin-top:6px;line-height:1.35}
+.mentor-role{font-size:8px;letter-spacing:.25em;color:#768399;margin-top:7px}
+@keyframes panelIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:650px){.mentor-grid{grid-template-columns:1fr;gap:14px}.mentor-photo-wrap{height:300px}.altar-mode{max-width:320px}}
+
+/* ---------- V7: Mentor is an option inside the same name dropdown ---------- */
+.mentor-option{border-top:1px solid rgba(255,255,255,.08);margin-top:7px;padding-top:14px!important}
+.mentor-option .option-star{color:#e7c873;text-shadow:0 0 12px rgba(231,200,115,.7)}
+.select-trigger.mentor-selected{border-color:rgba(231,200,115,.42);box-shadow:0 0 24px rgba(231,200,115,.08)}
+
+/* ---------- V7: Mentor Revelation ---------- */
+#mentorReveal{overflow:auto}
+.mentor-reveal-stage{width:min(980px,94vw);text-align:center;padding:30px 0 36px}
+.mentor-reveal-stage h2{font-family:var(--serif);font-size:clamp(36px,5vw,62px);letter-spacing:.14em;margin:8px 0 10px;color:#edf5ff}
+.mentor-reveal-intro{font-size:12px;letter-spacing:.08em;color:var(--muted);margin:0 auto 30px}
+.mentor-reveal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;max-width:820px;margin:0 auto}
+.mentor-reveal-card{position:relative;padding:18px 18px 24px;background:rgba(5,12,27,.76);border:1px solid rgba(180,210,245,.16);overflow:hidden;animation:mentorCardIn .9s cubic-bezier(.2,.75,.2,1) both}
+.mentor-reveal-card:nth-child(2){animation-delay:.18s}
+.mentor-reveal-card::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.035),transparent 42%);pointer-events:none}
+.mentor-reveal-photo{height:330px;position:relative;display:flex;justify-content:center;align-items:flex-end;overflow:hidden;background:rgba(0,0,0,.25)}
+.mentor-reveal-photo img{position:relative;z-index:2;height:100%;width:100%;object-fit:cover;object-position:center 18%;filter:saturate(.82) contrast(1.03);transition:transform .6s ease}
+.mentor-reveal-card:hover img{transform:scale(1.035)}
+.mentor-reveal-glow{position:absolute;width:230px;height:230px;border-radius:50%;bottom:-40px;left:50%;transform:translateX(-50%);filter:blur(35px);opacity:.42;z-index:1}
+.mentor-reveal-aldebaran{border-color:rgba(90,157,255,.38)}
+.mentor-reveal-aldebaran .mentor-reveal-glow{background:#3f94ff;box-shadow:0 0 80px #3f94ff}
+.mentor-reveal-sirius{border-color:rgba(235,74,79,.4)}
+.mentor-reveal-sirius .mentor-reveal-glow{background:#e9444c;box-shadow:0 0 80px #e9444c}
+.mentor-reveal-house{font-family:var(--serif);font-size:25px;letter-spacing:.22em;margin-top:20px}
+.mentor-reveal-aldebaran .mentor-reveal-house{color:#82baff;text-shadow:0 0 18px rgba(82,160,255,.38)}
+.mentor-reveal-sirius .mentor-reveal-house{color:#ff8588;text-shadow:0 0 18px rgba(255,74,80,.32)}
+.mentor-reveal-role{font-size:9px;letter-spacing:.34em;color:#d9c98d;margin-top:7px}
+.mentor-reveal-name{font-size:13px;letter-spacing:.08em;color:#dbe4f2;margin-top:13px}
+.mentor-reveal-stage .text-btn{margin-top:30px}
+@keyframes mentorCardIn{from{opacity:0;transform:translateY(28px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:700px){
+  .mentor-reveal-grid{grid-template-columns:1fr;max-width:420px}
+  .mentor-reveal-photo{height:300px}
+  .mentor-reveal-stage{padding-top:20px}
+}
+
+
+/* ---------- Final House Identity Polish ---------- */
+.reveal-star{width:190px;height:190px;display:grid;place-items:center;opacity:0;transform:translateY(12px) scale(.72);filter:drop-shadow(0 0 26px rgba(112,181,255,.32));transition:opacity .8s ease,transform 1s cubic-bezier(.16,.84,.28,1);z-index:2;overflow:hidden;border-radius:50%}
+.reveal-star img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%;mix-blend-mode:screen}
+.revelation-stage.revealing .reveal-star{opacity:1;transform:translateY(0) scale(1)}
+.theme-sirius .reveal-star{filter:drop-shadow(0 0 30px rgba(236,63,70,.34))}
+.house-symbol-large{width:min(260px,48vw);height:min(260px,48vw);margin:0 auto 10px;position:relative;border-radius:50%;overflow:hidden;filter:drop-shadow(0 0 30px rgba(92,165,255,.25))}
+.house-symbol-large img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%;mix-blend-mode:screen}
+.theme-sirius .house-symbol-large{filter:drop-shadow(0 0 32px rgba(236,63,70,.28))}
+.identity-block{width:min(760px,94vw);margin:30px auto 22px;padding:22px 20px;border:1px solid rgba(170,205,245,.14);background:rgba(4,11,25,.48)}
+.identity-label{font-size:9px;letter-spacing:.38em;color:#8290a6;margin-bottom:16px}
+.house-page .values{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.house-page .value{padding:16px 12px;border:1px solid rgba(160,198,240,.12);background:rgba(255,255,255,.025);font-family:var(--serif);font-size:14px;letter-spacing:.04em;color:#e8f0fb}
+.house-page .value span{display:block;font:600 8px var(--sans);letter-spacing:.28em;color:#71819a;margin-bottom:8px}
+.theme-sirius .house-page .value{border-color:rgba(226,83,87,.14)}
+.theme-sirius .house-page .value span{color:#d4797d}
+.name-menu{max-height:340px;overflow-y:auto;scrollbar-width:thin}
+.name-menu::-webkit-scrollbar{width:5px}.name-menu::-webkit-scrollbar-thumb{background:rgba(160,195,240,.2);border-radius:10px}
+.name-option{font-size:12px!important;letter-spacing:.02em!important}
+@media(max-width:700px){.house-page .values{grid-template-columns:repeat(2,1fr)}.reveal-star{width:155px;height:155px}}
+
+.house-mentor{margin:0 auto 12px;padding:14px 22px;border-top:1px solid rgba(170,205,245,.13);border-bottom:1px solid rgba(170,205,245,.13);display:flex;flex-direction:column;gap:7px;max-width:520px}
+.house-mentor span{font-size:8px;letter-spacing:.34em;color:#71819a}.house-mentor strong{font:500 18px var(--serif);color:#eaf2ff}
+.theme-sirius .house-mentor{border-color:rgba(225,80,84,.14)}
+
+
+/* ---------- Short viewport polish ---------- */
+@media (max-height: 900px){
+  #entry{padding-top:28px;padding-bottom:55px}
+  #entry .star-altar{min-height:0}
+  .altar-heading .eyebrow{margin-bottom:14px}
+  .altar-scene{height:245px;width:340px}
+  .ring-outer{width:225px;height:225px}
+  .ring-middle{width:175px;height:175px}
+  .ring-inner{width:120px;height:120px}
+  .altar-pedestal{width:88px;height:88px;bottom:22px}
+  .altar-gem{font-size:36px}
+  .altar-selection{margin-top:-2px}
+}
+
+@media (max-height: 760px){
+  #entry{padding-top:18px;padding-bottom:45px}
+  .altar-heading h2{font-size:clamp(28px,4vw,42px);margin-bottom:5px}
+  .altar-heading p{font-size:11px}
+  .altar-scene{height:205px;width:300px}
+  .ring-outer{width:190px;height:190px}
+  .ring-middle{width:145px;height:145px}
+  .ring-inner{width:100px;height:100px}
+  .altar-pedestal{width:76px;height:76px;bottom:18px}
+  .altar-gem{font-size:30px}
+  .star-altar .select-trigger{padding:14px 17px}
+  .name-option{padding:12px 13px}
+  .star-altar .name-menu{max-height:220px}
+  .star-altar .text-btn{margin-top:16px}
+}
+
+/* ---------- V9 Ceremony Audio ---------- */
+.audio-toggle{
+  position:fixed;right:22px;bottom:20px;z-index:1000;
+  width:42px;height:42px;border-radius:50%;
+  border:1px solid rgba(150,195,245,.28);
+  background:rgba(4,10,24,.68);color:#cfe4ff;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  box-shadow:0 0 22px rgba(65,130,220,.14);
+  font:600 17px var(--serif);cursor:pointer;
+  transition:transform .25s ease,background .25s ease,border-color .25s ease,box-shadow .25s ease;
+}
+.audio-toggle:hover{transform:translateY(-2px);background:rgba(8,18,38,.86);border-color:rgba(150,205,255,.5);box-shadow:0 0 28px rgba(65,145,255,.24)}
+.audio-toggle.muted{opacity:.55;color:#9aa8ba}
+.theme-sirius .audio-toggle{border-color:rgba(235,88,94,.32);color:#ffd0d2;box-shadow:0 0 22px rgba(220,55,65,.12)}
+@media(max-width:700px){.audio-toggle{right:14px;bottom:14px;width:38px;height:38px}}
